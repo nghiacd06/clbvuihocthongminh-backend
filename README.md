@@ -1,137 +1,154 @@
-# CLB Vui Học Thông Minh – Backend
+# 🎓 CLB Vui Học Thông Minh - Backend System
 
-**Production-ready NestJS Monolith 2025**
+![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-Live API (sau khi hoàn thành): `https://api.clbvuihocthongminh.com`  
-Frontend repo: https://github.com/nghiacd06/clbvuihocthongminh
+> **Lưu ý:** Dự án này được thiết kế theo tiêu chuẩn **Production-ready** nhằm mục đích học tập và nghiên cứu chuyên sâu về kiến trúc Backend hiện đại (2025).
 
-## 1. Mục tiêu dự án
+## 📖 Giới thiệu (Introduction)
 
-Xây dựng một backend hoàn chỉnh, có thể đưa vào production ngay cho nền tảng e-learning với các tính năng chính:
+Đây là hệ thống Backend (API) cho nền tảng E-learning **CLB Vui Học Thông Minh**. Dự án được xây dựng với kiến trúc **Modular Monolith** sử dụng **NestJS**, hướng tới khả năng mở rộng (scalability), dễ bảo trì (maintainability) và hiệu năng cao (performance).
 
-- Đăng ký / Đăng nhập / Refresh token với 4 vai trò (ADMIN – TEACHER – STUDENT – PARENT)
-- Quản lý người dùng, khóa học, bài tập, nộp bài, chấm điểm tự động/ thủ công
-- Bảng xếp hạng học viên
-- Upload tài liệu / bài nộp
-- Swagger documentation, Dockerized, CI/CD, deploy AWS Free Tier
+Hệ thống cung cấp đầy đủ các tính năng cho một nền tảng giáo dục trực tuyến: quản lý khóa học, bài tập, chấm điểm, bảng xếp hạng và phân quyền người dùng chi tiết.
 
-## 2. Tech Stack (2025 production standard)
+🔗 **Frontend Repository:** [clbvuihocthongminh-frontend](https://github.com/nghiacd06/clbvuihocthongminh)
+🔗 **Live API:** `https://api.clbvuihocthongminh.com` (Coming soon)
 
-| Layer             | Technology                              | Lý do chọn                                    |
-| ----------------- | --------------------------------------- | --------------------------------------------- |
-| Framework         | NestJS 13+ (TypeScript)                 | Opinionated, dễ scale → microservices sau này |
-| HTTP Adapter      | @nestjs/platform-fastify (optional)     | Performance cao hơn Express ~20-30%           |
-| Database          | PostgreSQL 16 + Prisma ORM              | Type-safe, migration mạnh, phổ biến nhất VN   |
-| Authentication    | JWT + Refresh Token + HttpOnly cookie   | Stateless, an toàn, chuẩn ngành               |
-| Password hashing  | argon2                                  | Bảo mật cao hơn bcrypt                        |
-| Validation        | class-validator + class-transformer     | Type-safe validation                          |
-| API Documentation | @nestjs/swagger                         | Tự động sinh Swagger UI đẹp                   |
-| Logging           | Winston + daily-rotate-file             | Log có cấu trúc, dễ debug production          |
-| Testing           | Jest (unit + e2e) – coverage > 85%      | Built-in, mạnh mẽ                             |
-| Containerization  | Docker + docker-compose (multi-stage)   | Local = Production                            |
-| Package manager   | pnpm 9                                  | Nhanh nhất, disk-efficient                    |
-| Deployment        | AWS EC2 t3.micro + RDS + GitHub Actions | Free Tier 12 tháng, chuẩn doanh nghiệp        |
-| File upload       | Cloudinary (hoặc AWS S3 sau này)        | Miễn phí, CDN toàn cầu                        |
+---
 
-## 3. Cấu trúc thư mục (chuẩn doanh nghiệp Việt Nam 2025)
+## 🛠 Công nghệ sử dụng (Tech Stack)
 
-src/
-├── app.module.ts
-├── main.ts
-├── common/
-│ ├── decorators/ # @Roles(), @Public(), @CurrentUser()
-│ ├── filters/ # AllExceptionsFilter
-│ ├── guards/ # JwtAuthGuard, RolesGuard
-│ ├── interceptors/ # ResponseInterceptor, LoggingInterceptor
-│ ├── pipes/ # Global ValidationPipe
-│ └── dto/ # BaseResponseDto, PaginationDto
-├── config/
-│ └── configuration.ts # @nestjs/config
-├── modules/
-│ ├── auth/
-│ │ ├── dto/
-│ │ ├── auth.controller.ts
-│ │ ├── auth.service.ts
-│ │ └── auth.module.ts
-│ ├── users/
-│ ├── courses/
-│ ├── assignments/
-│ ├── scores/
-│ ├── rankings/
-│ └── upload/
-├── prisma/
-│ ├── schema.prisma
-│ └── seed.ts
-└── shared/
-└── utils/
-text## 4. Các module chính & API endpoints (đã thiết kế)
+Dự án áp dụng các công nghệ và thư viện chuẩn mực của ngành (Industry Standard) trong năm 2025:
 
-| Module      | Endpoint mẫu                 | Role cho phép          |
-| ----------- | ---------------------------- | ---------------------- |
-| Auth        | POST /auth/register          | Public                 |
-|             | POST /auth/login             | Public                 |
-|             | POST /auth/refresh           | Public (refresh token) |
-| Users       | GET /users/me                | All authenticated      |
-|             | PATCH /users/me              | Owner                  |
-| Courses     | POST /courses                | TEACHER, ADMIN         |
-|             | POST /courses/:id/enroll     | STUDENT                |
-| Assignments | POST /assignments            | TEACHER                |
-|             | POST /assignments/:id/submit | STUDENT                |
-| Scores      | GET /scores/my-history       | STUDENT                |
-| Rankings    | GET /rankings/top-10         | All authenticated      |
-| Upload      | POST /upload                 | Authenticated          |
+| Hạng mục             | Công nghệ             | Lý do lựa chọn (Design Decision)                                                     |
+| :------------------- | :-------------------- | :----------------------------------------------------------------------------------- |
+| **Core Framework**   | **NestJS 10+**        | Framework số 1 cho Node.js Enterprise. Cấu trúc rõ ràng, hỗ trợ TypeScript tốt nhất. |
+| **Language**         | **TypeScript 5.x**    | Type-safety, giảm thiểu lỗi runtime, DX (Developer Experience) tuyệt vời.            |
+| **Database**         | **PostgreSQL 16**     | RDBMS mạnh mẽ, ổn định, hỗ trợ JSONB và các tính năng nâng cao.                      |
+| **ORM**              | **Prisma**            | Type-safe ORM, migration dễ dàng, DX tốt hơn TypeORM.                                |
+| **Authentication**   | **JWT + Argon2**      | Stateless auth, Argon2 an toàn hơn Bcrypt.                                           |
+| **Caching**          | **Redis** (Planned)   | Caching response, session management, queues.                                        |
+| **Documentation**    | **Swagger (OpenAPI)** | Tự động sinh tài liệu API, test API trực tiếp.                                       |
+| **Containerization** | **Docker**            | Đảm bảo môi trường đồng nhất (Dev = Prod).                                           |
+| **CI/CD**            | **GitHub Actions**    | Tự động hóa quy trình test và deploy.                                                |
 
-## 5. Quá trình triển khai (Implementation Roadmap)
+---
 
-| Tuần | Nội dung chính                                | Kết quả đạt được                         |
-| ---- | --------------------------------------------- | ---------------------------------------- |
-| 1    | Project init, Docker, Prisma, Auth hoàn chỉnh | Register/Login 4 role + protected routes |
-| 2    | Users module, Swagger, Logging, Tests         | CRUD user + API docs đẹp                 |
-| 3    | Courses + Assignments + File upload           | Teacher tạo khóa học, student nộp bài    |
-| 4    | Scores, Rankings, Rate limiting, Security     | Leaderboard + production hardening       |
-| 5    | Seed data, Health check, Deploy Railway       | Backend live tạm thời (miễn phí)         |
-| 6    | AWS EC2 + RDS + GitHub Actions + SSL          | Backend live thật với domain + HTTPS     |
+## 📂 Kiến trúc hệ thống (Architecture)
 
-## 6. Local Development
+Dự án tuân theo kiến trúc **Modular Monolith**, giúp code được tổ chức gọn gàng theo từng domain (Auth, User, Course...) nhưng vẫn chạy trên một process duy nhất để tối ưu chi phí hạ tầng ban đầu. Dễ dàng tách thành Microservices khi cần thiết.
 
-```bash
-# 1. Clone & install
-git clone https://github.com/nghiacd06/clbvuihocthongminh-backend.git
-cd clbvuihocthongminh-backend
-cp .env.example .env
-pnpm install
-
-# 2. Chạy DB + pgAdmin
-docker-compose up -d
-
-# 3. Migrate & seed
-npx prisma migrate dev
-npx prisma db seed   # tạo admin default
-
-# 4. Run app
-pnpm run start:dev
+### Cấu trúc thư mục (Folder Structure)
 
 ```
+src/
+├── common/          # Các thành phần dùng chung (Decorators, Guards, Filters...)
+├── config/          # Cấu hình hệ thống (Environment variables)
+├── modules/         # Các module nghiệp vụ (Domain logic)
+│   ├── auth/        # Xác thực & Phân quyền
+│   ├── users/       # Quản lý người dùng
+│   ├── courses/     # Quản lý khóa học
+│   └── ...
+├── prisma/          # Database Schema & Seeds
+└── main.ts          # Entry point
+```
 
-Truy cập:
+---
 
-API: http://localhost:3000
-Swagger: http://localhost:3000/api-docs
-pgAdmin: http://localhost:8080
+## 🚀 Tính năng chính (Key Features)
 
-## 7. Production Deployment (AWS Free Tier)
+1.  **Authentication & Authorization**:
 
-Tạo EC2 (Amazon Linux 2023) + RDS PostgreSQL
-Security Group: mở port 22 (SSH), 80, 443, 3000
-Cấu hình GitHub Actions (file .github/workflows/deploy.yml đã có sẵn)
-Push code → tự động build & deploy
-Cài Nginx + Certbot (Let’s Encrypt) → HTTPS miễn phí
+    - Đăng ký/Đăng nhập (Email/Password).
+    - Refresh Token rotation.
+    - Phân quyền dựa trên Role (RBAC): `ADMIN`, `TEACHER`, `STUDENT`, `PARENT`.
 
-## 8. Tiêu chí hoàn thành dự án
+2.  **Quản lý Khóa học (LMS)**:
 
-- [ ] Swagger UI hoạt động đầy đủ và đẹp
-- [ ] Docker compose chạy chỉ 1 lệnh
-- [ ] Test coverage > 85%
-- [ ] Backend live trên AWS với HTTPS
-- [ ] Frontend Next.js kết nối thành công 100% API
-- [ ] README có badge CI/CD + AWS + NestJS
+    - Tạo, sửa, xóa khóa học (Teacher/Admin).
+    - Đăng ký tham gia khóa học (Student).
+
+3.  **Bài tập & Chấm điểm**:
+
+    - Giao bài tập, nộp bài (File upload).
+    - Chấm điểm tự động hoặc thủ công.
+
+4.  **Gamification**:
+    - Bảng xếp hạng (Leaderboard) dựa trên điểm số.
+    - Hệ thống danh hiệu (Badges) - _Planned_.
+
+---
+
+## 🚦 Hướng dẫn cài đặt (Getting Started)
+
+### Yêu cầu (Prerequisites)
+
+- Node.js >= 20
+- pnpm >= 9
+- Docker & Docker Compose
+
+### Cài đặt & Chạy Local
+
+1.  **Clone dự án:**
+
+    ```bash
+    git clone https://github.com/nghiacd06/clbvuihocthongminh-backend.git
+    cd clbvuihocthongminh-backend
+    ```
+
+2.  **Cài đặt dependencies:**
+
+    ```bash
+    pnpm install
+    ```
+
+3.  **Cấu hình môi trường:**
+
+    ```bash
+    cp .env.example .env
+    # Cập nhật các biến môi trường trong file .env nếu cần
+    ```
+
+4.  **Khởi chạy Database (Docker):**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+5.  **Chạy Migration & Seed data:**
+
+    ```bash
+    npx prisma migrate dev
+    npx prisma db seed
+    ```
+
+6.  **Khởi chạy Server:**
+    ```bash
+    pnpm run start:dev
+    ```
+
+👉 **API Server:** `http://localhost:3000`
+👉 **Swagger Docs:** `http://localhost:3000/api-docs`
+
+---
+
+## 🗺 Lộ trình phát triển (Roadmap)
+
+- [x] **Phase 1:** Khởi tạo dự án, thiết lập Docker, Prisma, Auth cơ bản.
+- [ ] **Phase 2:** Module Users, Profile, Role Management.
+- [ ] **Phase 3:** Module Courses, Lessons, Assignments.
+- [ ] **Phase 4:** Tính năng nộp bài, chấm điểm, File Upload (S3/Cloudinary).
+- [ ] **Phase 5:** Bảng xếp hạng, Thống kê.
+- [ ] **Phase 6:** Testing (Unit/E2E), CI/CD, Deployment.
+
+---
+
+## 🤝 Đóng góp (Contributing)
+
+Mọi đóng góp đều được hoan nghênh! Vui lòng tạo Pull Request hoặc mở Issue để thảo luận.
+
+## 📄 License
+
+Dự án này được cấp phép dưới [MIT License](LICENSE).
